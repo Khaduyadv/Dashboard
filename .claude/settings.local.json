@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"../PublishDashboard.ps1\" 2>&1; pwd)"
+    ]
+  }
+}
