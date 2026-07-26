@@ -216,7 +216,7 @@ const CT2={vt:D.voucher.length, gh:new Set(D.voucher.map(v=>v.gh)).size,
 CT2.pct=CT2.ns1?D.ct2_tot.cumv/CT2.ns1:0;
 
 pm1.innerHTML=`Trợ giá món ăn tại gian hàng · NS tháng <b>${B(CT1.ns)}</b> · ${CT1.gh} GH (${CT1.onair} On Air) · ${CT1.mon} món · đã dùng <b>${pc(CT1.pct)}</b> (${fmt(CT1.rd)} lượt gồm ${D.ct1_tot.bl} bảo lưu)`;
-pm2.innerHTML=`Voucher 50.000đ phát cho cư dân · NS 3 đợt <b>${B(CT2.tong)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt gồm ${D.ct2_tot.bl} bảo lưu)`;
+pm2.innerHTML=`Voucher 50.000đ phát cho cư dân · NS đợt 1 <b>${B(CT2.ns1)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt gồm ${D.ct2_tot.bl} bảo lưu)`;
 
 /* ===== TAB: Tổng quan ===== */
 ovKpi.innerHTML=[
