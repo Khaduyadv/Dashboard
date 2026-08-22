@@ -226,12 +226,13 @@ const CT1={gh:D.gh.length, onair:D.gh.filter(g=>g.onair==='On Air').length,
   used:D.ct1_tot.cumv, rd:D.ct1_tot.cum, mon:D.mon.length};
 CT1.pct=CT1.ns?CT1.used/CT1.ns:0;
 const CT2={vt:D.voucher.length, gh:new Set(D.voucher.map(v=>v.gh)).size,
-  ns1:S(D.voucher,'ns'), sl:S(D.voucher,'sl'), tong:D.tong_ns,
+  ns1:S(D.voucher,'ns'), ns2:(D.dot&&D.dot[1]&&D.dot[1].ns)||0,
+  sl:S(D.voucher,'sl'), tong:D.tong_ns,
   onair:D.voucher.filter(v=>v.onair==='On Air').length};
-CT2.pct=CT2.ns1?D.ct2_tot.cumv/CT2.ns1:0;
+CT2.pct=CT2.ns2?D.ct2_tot.cumv/CT2.ns2:0;
 
 pm1.innerHTML=`Trợ giá món ăn tại gian hàng · NS tháng <b>${B(CT1.ns)}</b> · ${CT1.gh} GH (${CT1.onair} On Air) · ${CT1.mon} món · đã dùng <b>${pc(CT1.pct)}</b> (${fmt(CT1.rd)} lượt gồm ${D.ct1_tot.bl} bảo lưu)`;
-pm2.innerHTML=`${CT2_LABEL} · Voucher 50.000đ phát cho cư dân · NS đợt 1 <b>${B(CT2.ns1)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt gồm ${D.ct2_tot.bl} bảo lưu từ ${CT2_START})`;
+pm2.innerHTML=`${CT2_LABEL} · Voucher 50.000đ phát cho cư dân · NS đợt 2 <b>${B(CT2.ns2)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt từ ${CT2_START})`;
 
 /* ===== TAB: Tổng quan ===== */
 ovKpi.innerHTML=[
@@ -239,15 +240,15 @@ ovKpi.innerHTML=[
  K('a','CT1 · NS tháng',B(CT1.ns),fmt(CT1.sl)+' món tặng'),
  K('hot','CT1 · Redeem ngày BC',fmt(D.ct1_tot.day)+' lượt',fmt(D.ct1_tot.dayv)+' đ · gồm bảo lưu'),
  K('a','CT1 · Lũy kế redeem',fmt(D.ct1_tot.cum)+' lượt',M(D.ct1_tot.cumv)+' · '+pc(CT1.pct)),
- K('b',CT2_LABEL+' · NS 3 đợt',B(CT2.tong),'mệnh giá 50.000đ'),
- K('b',CT2_LABEL+' · Voucher Đợt 1',fmt(CT2.sl),B(CT2.ns1)+' phân bổ'),
+ K('b',CT2_LABEL+' · NS Đợt 2',B(CT2.ns2),'giá trị NS Đợt 2'),
+ K('b',CT2_LABEL+' · Voucher Đợt 2',fmt(CT2.sl),'SL Voucher: '+fmt(CT2.sl)),
  K('hot2',CT2_LABEL+' · Redeem ngày BC',fmt(D.ct2_tot.day)+' lượt',D.ct2_tot.day?fmt(D.ct2_tot.dayv)+' đ · gồm bảo lưu':'chưa phát sinh trong ngày'),
- K('b',CT2_LABEL+' · Lũy kế redeem',fmt(D.ct2_tot.cum)+' lượt',D.ct2_tot.cum?M(D.ct2_tot.cumv)+' · gồm bảo lưu':'chưa có từ '+CT2_START)
+ K('b',CT2_LABEL+' · Lũy kế redeem',fmt(D.ct2_tot.cum)+' lượt',D.ct2_tot.cum?M(D.ct2_tot.cumv)+' · '+pc(CT2.pct)+' NS sử dụng':'chưa có từ '+CT2_START)
 ].join('');
 
 mk('o1',{type:'bar',data:{labels:['CT1 · Tặng món (NS tháng)',CT2_LABEL+' · Cư dân (3 đợt)'],datasets:[
  {label:'Ngân sách',data:[CT1.ns/1e9,CT2.tong/1e9],backgroundColor:[C.b,C.o],borderRadius:6},
- {label:'Đã sử dụng / đã phân bổ',data:[CT1.used/1e9,CT2.ns1/1e9],backgroundColor:[C.b+'55',C.o+'55'],borderRadius:6}]},
+  {label:'Đã sử dụng / đã phân bổ',data:[CT1.used/1e9,CT2.ns2/1e9],backgroundColor:[C.b+'55',C.o+'55'],borderRadius:6}]},
  options:{plugins:{legend:{position:'bottom'}},scales:{y:{title:{display:true,text:'tỷ VNĐ'}}}}});
 
 mk('o2',{type:'bar',data:{labels:['The Venice','K-Town','Khác'],datasets:[
@@ -259,10 +260,10 @@ mk('o2',{type:'bar',data:{labels:['The Venice','K-Town','Khác'],datasets:[
 tOv.innerHTML='<thead><tr><th>Tiêu chí</th><th>CT1 · Voucher Tặng món</th><th>'+CT2_LABEL+' · Voucher Cư dân</th></tr></thead><tbody>'+[
  ['Hình thức','Trợ giá món ăn tại gian hàng','Voucher 50.000đ phát cho cư dân'],
  ['Cơ sở ngân sách','Theo tháng','Theo 3 đợt phát hành'],
- ['Ngân sách',B(CT1.ns)+' /tháng',B(CT2.tong)+' · Đợt 1 '+B(3.4e9)],
+  ['Ngân sách',B(CT1.ns)+' /tháng',B(CT2.ns2)+' · Đợt 2'],
  ['Quy mô',CT1.gh+' gian hàng · '+CT1.mon+' món',CT2.vt+' vị trí · '+CT2.gh+' thương hiệu'],
  ['Đã triển khai',CT1.onair+' GH On Air',CT2.onair+' GH On Air'],
- ['Sản lượng',fmt(CT1.sl)+' món tặng/tháng',fmt(CT2.sl)+' voucher đợt 1'],
+  ['Sản lượng',fmt(CT1.sl)+' món tặng/tháng',fmt(CT2.sl)+' voucher đợt 2'],
   ['Redeem ngày BC '+repStr,fmt(D.ct1_tot.day)+' lượt · '+fmt(D.ct1_tot.dayv)+' đ',D.ct2_tot.cum?fmt(D.ct2_tot.day)+' lượt · '+fmt(D.ct2_tot.dayv)+' đ':'0 lượt'],
   ['Redeem lũy kế',fmt(D.ct1_tot.cum)+' lượt · '+M(D.ct1_tot.cumv)+' ('+pc(CT1.pct)+')',D.ct2_tot.cum?fmt(D.ct2_tot.cum)+' lượt · '+M(D.ct2_tot.cumv):'0 lượt — chưa có từ '+CT2_START],
  ['Trong đó bảo lưu',fmt(D.ct1_tot.bl)+' lượt ('+pc(D.ct1_tot.cum?D.ct1_tot.bl/D.ct1_tot.cum:0)+')',D.ct2_tot.cum?fmt(D.ct2_tot.bl)+' lượt':'—'],
