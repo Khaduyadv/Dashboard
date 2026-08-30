@@ -41,13 +41,29 @@ h1{font-size:27px;font-weight:700;letter-spacing:-.4px;color:#111827}
 .kpi.hot .l,.kpi.hot2 .l{color:rgba(255,255,255,.92)}
 .kpi.hot .v,.kpi.hot2 .v{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.22)}
 .kpi.hot .d,.kpi.hot2 .d{color:rgba(255,255,255,.90)}
-/* Hàng KPI tổng quan: ép tất cả thẻ về đúng 1 hàng, thu nhỏ vừa khung */
-#ovKpi{grid-template-columns:repeat(8,minmax(0,1fr));gap:9px}
-#ovKpi .kpi{padding:12px 10px}
-#ovKpi .l{font-size:9.5px;letter-spacing:.3px}
-#ovKpi .v{font-size:18px!important;margin-top:5px}
-#ovKpi .d{font-size:10px;margin-top:3px}
-@media(max-width:1100px){#ovKpi{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* Tổng quan: hai chương trình cùng một cấu trúc để so sánh nhanh */
+#ovKpi{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.ov-program{border:1px solid #d9dfe9;border-top:4px solid;border-radius:16px;padding:18px;box-shadow:0 4px 14px rgba(16,24,40,.08);min-width:0}
+.ov-program.ct1{border-top-color:#6b9fe8;background:linear-gradient(145deg,#fff 0%,#f5f9ff 100%)}
+.ov-program.ct22{border-top-color:#e9975e;background:linear-gradient(145deg,#fff 0%,#fff8f1 100%)}
+.ov-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.ov-kicker{font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:#4f82cc}
+.ct22 .ov-kicker{color:#c9742f}
+.ov-title{font-size:20px;font-weight:750;color:#111827;margin-top:4px;letter-spacing:-.3px}
+.ov-sub{font-size:12px;color:#6f7887;margin-top:4px;line-height:1.45}
+.ov-mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#fff;background:#2563eb;flex:0 0 auto}
+.ct22 .ov-mark{background:#ea7317}
+.ov-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.ov-metric{background:rgba(255,255,255,.78);border:1px solid rgba(203,213,225,.75);border-radius:10px;padding:11px 12px;min-width:0}
+.ov-metric .label{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:.45px;font-weight:700;line-height:1.3}
+.ov-metric .value{font-size:21px;font-weight:750;color:#0f172a;margin-top:6px;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ov-metric .detail{font-size:11px;color:#7b8492;margin-top:3px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:680px){
+ #ovKpi{grid-template-columns:1fr;gap:12px}
+ .ov-program{padding:15px}
+ .ov-title{font-size:18px}
+ .ov-metric .value{font-size:19px}
+}
 .grid{display:grid;gap:16px;margin-bottom:16px}
 .g2{grid-template-columns:1fr 1fr}
 .card{background:#fff;border:1px solid #d9dfe9;border-radius:12px;padding:18px;box-shadow:0 1px 4px rgba(16,24,40,.07)}
@@ -102,7 +118,6 @@ th.sortable .arr{margin-left:3px;opacity:.6;font-size:10px}
 <section id="ov">
   <div class="kpis" id="ovKpi"></div>
   <div class="card"><h3>Gian hàng có redeem — ngày báo cáo và lũy kế</h3><div class="scroll"><table id="tOvRedeem"></table></div></div>
-  <div class="card"><h3>So sánh 2 chương trình</h3><table id="tOv"></table></div>
 </section>
 
 <section id="hh" class="hide">
@@ -228,16 +243,18 @@ pm1.innerHTML=`Trợ giá món ăn tại gian hàng · NS tháng <b>${B(CT1.ns)}
 pm2.innerHTML=`${CT2_LABEL} · Voucher 50.000đ phát cho cư dân · NS chương trình <b>${B(CT2.ns2)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt từ ${CT2_START})`;
 
 /* ===== TAB: Tổng quan ===== */
-ovKpi.innerHTML=[
- K('','Tổng NS chiến dịch',B(CT1.ns+CT2.tong),'CT1 tháng + '+CT2_LABEL),
- K('a','CT1 · NS tháng',B(CT1.ns),fmt(CT1.sl)+' món tặng'),
- K('hot','CT1 · Redeem ngày BC',fmt(D.ct1_tot.day)+' lượt',fmt(D.ct1_tot.dayv)+' đ · gồm bảo lưu'),
- K('a','CT1 · Lũy kế redeem',fmt(D.ct1_tot.cum)+' lượt',M(D.ct1_tot.cumv)+' · '+pc(CT1.pct)),
- K('b',CT2_LABEL+' · NS chương trình',B(CT2.ns2),'giá trị NS theo sheet CT2.2'),
- K('b',CT2_LABEL+' · Voucher',fmt(CT2.sl),'SL Voucher theo NS tổng'),
- K('hot2',CT2_LABEL+' · Redeem ngày BC',fmt(D.ct2_tot.day)+' lượt',D.ct2_tot.day?fmt(D.ct2_tot.dayv)+' đ · gồm bảo lưu':'chưa phát sinh trong ngày'),
- K('b',CT2_LABEL+' · Lũy kế redeem',fmt(D.ct2_tot.cum)+' lượt',D.ct2_tot.cum?M(D.ct2_tot.cumv)+' · '+pc(CT2.pct)+' NS sử dụng':'chưa có từ '+CT2_START)
-].join('');
+const ovMetric=(label,value,detail)=>'<div class="ov-metric"><div class="label">'+label+'</div><div class="value">'+value+'</div><div class="detail">'+detail+'</div></div>';
+const ovCard=(cls,kicker,title,sub,mark,metrics)=>'<article class="ov-program '+cls+'"><div class="ov-head"><div><div class="ov-kicker">'+kicker+'</div><div class="ov-title">'+title+'</div><div class="ov-sub">'+sub+'</div></div><div class="ov-mark">'+mark+'</div></div><div class="ov-metrics">'+metrics+'</div></article>';
+ovKpi.innerHTML=ovCard('ct1','Chương trình 1','Voucher Tặng món','Trợ giá món ăn tại gian hàng','1',
+  ovMetric('Ngân sách tháng',B(CT1.ns),fmt(CT1.sl)+' món tặng/tháng')+
+  ovMetric('Redeem ngày BC',fmt(D.ct1_tot.day)+' lượt',fmt(D.ct1_tot.dayv)+' đ')+
+  ovMetric('Redeem lũy kế',fmt(D.ct1_tot.cum)+' lượt',M(D.ct1_tot.cumv)+' · '+pc(CT1.pct)+' NS')+
+  ovMetric('% sử dụng NS',pc(CT1.pct),'Giá trị redeem / NS tháng'))+
+ ovCard('ct22','Chương trình 2 · CT2.2','Voucher Cư dân giai đoạn 2','Tính từ 00:00 ngày '+CT2_START,'2',
+  ovMetric('NS chương trình',B(CT2.ns2),'Ô N22 · sheet CT2.2')+
+  ovMetric('Số voucher',fmt(CT2.sl),'Mệnh giá 50.000đ')+
+  ovMetric('Redeem ngày BC',fmt(D.ct2_tot.day)+' lượt',fmt(D.ct2_tot.dayv)+' đ')+
+  ovMetric('Redeem lũy kế',fmt(D.ct2_tot.cum)+' lượt',M(D.ct2_tot.cumv)+' · '+pc(CT2.pct)+' NS'));
 
 const ovRedeem=[
  ...D.gh.filter(g=>g.rd_day||g.rd_tot).map(g=>({prog:'CT1',gh:g.name,day:g.rd_day||0,cum:g.rd_tot||0,val:g.rd_val||0})),
@@ -245,19 +262,6 @@ const ovRedeem=[
 ].sort((a,b)=>b.day-a.day||b.cum-a.cum||a.gh.localeCompare(b.gh,'vi'));
 tOvRedeem.innerHTML='<thead><tr><th>Chương trình</th><th>Gian hàng</th><th class="num">Ngày BC</th><th class="num">Redeem LK</th><th class="num">Giá trị dùng</th></tr></thead><tbody>'+ovRedeem.map(r=>`<tr><td><span class="pill ${r.prog==='CT1'?'ok':'mut'}">${r.prog}</span></td><td><b>${r.gh}</b></td><td class="num">${r.day?'<b>'+fmt(r.day)+'</b>':'—'}</td><td class="num"><b>${fmt(r.cum)}</b></td><td class="num">${fmt(r.val)}</td></tr>`).join('')+'</tbody>';
 
-tOv.innerHTML='<thead><tr><th>Tiêu chí</th><th>CT1 · Voucher Tặng món</th><th>'+CT2_LABEL+' · Voucher Cư dân</th></tr></thead><tbody>'+[
- ['Hình thức','Trợ giá món ăn tại gian hàng','Voucher 50.000đ phát cho cư dân'],
-  ['Cơ sở ngân sách','Theo tháng','Theo ô NS tổng sheet CT2.2'],
-  ['Ngân sách',B(CT1.ns)+' /tháng',B(CT2.ns2)+' · CT2.2'],
- ['Quy mô',CT1.gh+' gian hàng · '+CT1.mon+' món',CT2.vt+' vị trí · '+CT2.gh+' thương hiệu'],
- ['Đã triển khai',CT1.onair+' GH On Air',CT2.onair+' GH On Air'],
-   ['Sản lượng',fmt(CT1.sl)+' món tặng/tháng',fmt(CT2.sl)+' voucher CT2.2'],
-  ['Redeem ngày BC '+repStr,fmt(D.ct1_tot.day)+' lượt · '+fmt(D.ct1_tot.dayv)+' đ',D.ct2_tot.cum?fmt(D.ct2_tot.day)+' lượt · '+fmt(D.ct2_tot.dayv)+' đ':'0 lượt'],
-  ['Redeem lũy kế',fmt(D.ct1_tot.cum)+' lượt · '+M(D.ct1_tot.cumv)+' ('+pc(CT1.pct)+')',D.ct2_tot.cum?fmt(D.ct2_tot.cum)+' lượt · '+M(D.ct2_tot.cumv):'0 lượt — chưa có từ '+CT2_START],
- ['Trong đó bảo lưu',fmt(D.ct1_tot.bl)+' lượt ('+pc(D.ct1_tot.cum?D.ct1_tot.bl/D.ct1_tot.cum:0)+')',D.ct2_tot.cum?fmt(D.ct2_tot.bl)+' lượt':'—'],
- ['Tiền tố mã voucher','OCCTANGMON','OCP23COMBOKPTM'],
-  ['Nguồn dữ liệu','BCQT_Happy Hour.xlsx · sheet CT1','BCQT_Happy Hour.xlsx · sheet '+CT2_LABEL]
-].map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('')+'</tbody>';
 
 /* ===== TAB: CT1 ===== */
 function fill(sel,label,vals,fn){const e=document.getElementById(sel);
