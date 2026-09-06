@@ -196,7 +196,7 @@ th.sortable .arr{margin-left:3px;opacity:.6;font-size:10px}
 <div class="note">
 <b>Ghi chú cơ sở số liệu:</b> Hai chương trình có cơ sở ngân sách khác nhau nên không cộng gộp trực tiếp.
 CT1 Voucher Tặng món tính theo <b>ngân sách tháng</b> (nguồn BCQT_Happy Hour.xlsx · sheet CT1), % sử dụng = giá trị redeem / NS tháng đã phê duyệt.
- CT2.2 Voucher Cư dân giai đoạn 2 tính theo ngân sách tổng tại ô <b>N22</b> của sheet CT2.2, mệnh giá 50.000đ/voucher; chỉ tính voucher redeem từ 00:00 ngày 18/08/2026 trở đi.
+ CT2.2 Voucher Cư dân giai đoạn 2 hiển thị <b>NS áp dụng = tổng NS của các GH trạng thái On Air</b> trên sheet CT2.2; ô <b>N22</b> chỉ là NS tổng phê duyệt ban đầu để tham chiếu. Mệnh giá 50.000đ/voucher; chỉ tính voucher redeem từ 00:00 ngày 18/08/2026 trở đi.
 <br><b>Nguyên tắc tính toán (áp dụng cho cả 2 chương trình và toàn bộ báo cáo):</b>
 <br>1. Lọc mã voucher: CT1 phải chứa <b>OCCTANGMON</b>; CT2.2 phải chứa <b>OCP23COMBOKPTM</b> và ngày sử dụng từ <b>18/08/2026</b>. Mã không chứa tiêu chí này bị loại khỏi số liệu chương trình.
 <br>2. Redeem ghi nhận = <b>Đã sử dụng + Đang bảo lưu</b>. <b>Hủy bảo lưu không đưa vào tính toán</b> (<span id="ftHuy">—</span> giao dịch, đã loại bỏ).
@@ -253,14 +253,15 @@ const CT1={gh:D.gh.length, onair:D.gh.filter(g=>g.onair==='On Air').length,
   ns:S(D.gh,'ns_thang'), nsPd:S(D.gh,'ns_pd'), sl:S(D.gh,'sl_thang'),
   used:D.ct1_tot.cumv, rd:D.ct1_tot.cum, mon:D.mon.length};
 CT1.pct=CT1.ns?CT1.used/CT1.ns:0;
+const CT2OnAir=D.voucher.filter(v=>v.onair==='On Air');
 const CT2={vt:D.voucher.length, gh:new Set(D.voucher.map(v=>v.gh)).size,
-  ns1:S(D.voucher,'ns'), ns2:D.tong_ns||0,
-  sl:(D.dot&&D.dot[0]&&D.dot[0].ns)?D.dot[0].ns/50000:S(D.voucher,'sl'), tong:D.tong_ns||0,
-  onair:D.voucher.filter(v=>v.onair==='On Air').length};
-CT2.pct=CT2.ns2?D.ct2_tot.cumv/CT2.ns2:0;
+  ns1:S(D.voucher,'ns'), ns2:D.tong_ns||0, nsOnAir:S(CT2OnAir,'ns'),
+  sl:S(CT2OnAir,'sl'), slTotal:S(D.voucher,'sl'), tong:D.tong_ns||0,
+  onair:CT2OnAir.length};
+CT2.pct=CT2.nsOnAir?D.ct2_tot.cumv/CT2.nsOnAir:0;
 
 pm1.innerHTML=`Trợ giá món ăn tại gian hàng · NS tháng <b>${B(CT1.ns)}</b> · ${CT1.gh} GH (${CT1.onair} On Air) · ${fmt(CT1.sl)} suất/tháng · đã dùng <b>${pc(CT1.pct)}</b> (${fmt(CT1.rd)} lượt gồm ${D.ct1_tot.bl} bảo lưu)`;
-pm2.innerHTML=`${CT2_LABEL} · Voucher 50.000đ phát cho cư dân · NS chương trình <b>${B(CT2.ns2)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt từ ${CT2_START})`;
+pm2.innerHTML=`${CT2_LABEL} · Voucher 50.000đ phát cho cư dân · NS áp dụng On Air <b>${B(CT2.nsOnAir)}</b> · đã dùng <b>${pc(CT2.pct)}</b> (${fmt(D.ct2_tot.cum)} lượt từ ${CT2_START})`;
 
 /* ===== TAB: Tổng quan ===== */
 const ovMetric=(label,value,detail,cls='')=>'<div class="ov-metric '+cls+'"><div class="label">'+label+'</div><div class="value">'+value+'</div><div class="detail">'+detail+'</div></div>';
@@ -271,8 +272,8 @@ ovKpi.innerHTML=ovCard('ct1','Chương trình 1','Voucher Tặng món','Trợ gi
   ovMetric('Redeem ngày BC',fmt(D.ct1_tot.day)+' lượt',fmt(D.ct1_tot.dayv)+' đ','featured')+
   ovMetric('Redeem lũy kế',fmt(D.ct1_tot.cum)+' lượt',M(D.ct1_tot.cumv)+' · '+pc(CT1.pct)+' NS'))+
  ovCard('ct22','Chương trình 2 · CT2.2','Voucher Cư dân giai đoạn 2','Tính từ 00:00 ngày '+CT2_START,'2',
-  ovMetric('Ngân sách',B(CT2.ns2),'NS chương trình · Ô N22')+
-  ovMetric('Phát hành/tháng',fmt(CT2.sl),'Voucher 50.000đ/tháng')+
+  ovMetric('Ngân sách',B(CT2.nsOnAir),'NS các GH On Air · N22 tổng: '+B(CT2.ns2))+
+  ovMetric('Phát hành/tháng',fmt(CT2.sl),'Voucher 50.000đ · GH On Air')+
   ovMetric('Redeem ngày BC',fmt(D.ct2_tot.day)+' lượt',fmt(D.ct2_tot.dayv)+' đ','featured')+
   ovMetric('Redeem lũy kế',fmt(D.ct2_tot.cum)+' lượt',M(D.ct2_tot.cumv)+' · '+pc(CT2.pct)+' NS'));
 
